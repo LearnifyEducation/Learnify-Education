@@ -12,13 +12,12 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "LearnifyEducation2026";
 const DATA_DIR = path.join(__dirname, "data");
 const DATA_FILE = path.join(DATA_DIR, "leads.json");
 const VACANCY_FILE = path.join(DATA_DIR, "vacancies.json");
-const CONTENT_FILE = path.join(DATA_DIR, "content.json");
+const CONTENT_FILE = path.join(__dirname, "content.json");
 const UPLOAD_DIR = path.join(__dirname, "uploads");
 
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 if (!fs.existsSync(DATA_FILE)) fs.writeFileSync(DATA_FILE, "[]", "utf8");
 if (!fs.existsSync(VACANCY_FILE)) fs.writeFileSync(VACANCY_FILE, "[]", "utf8");
-if (!fs.existsSync(CONTENT_FILE)) fs.writeFileSync(CONTENT_FILE, JSON.stringify({uz:{},ru:{},en:{}}, null, 2), "utf8");
 if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 
 app.use(express.json({ limit: "1mb" }));
