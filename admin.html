@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="uz">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Learnify Admin</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+
+<body style="background:#f5f8f6">
+  <div class="container" style="padding:40px 0">
+    <div id="loginBox" class="form" style="max-width:500px;margin:70px auto;text-align:center">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:28px">
+        <img src="/assets/logo.png" alt="Learnify Education" style="width:82px;height:82px;object-fit:contain">
+        <div style="font-size:25px;font-weight:850;letter-spacing:-.04em">Learnify Education</div>
+      </div>
+      <h2 style="margin-bottom:8px">Administratorlar uchun</h2>
+      <p style="color:var(--muted);margin-top:0">Learnify Education arizalarini boshqarish</p>
+      <form id="loginForm">
+        <div class="field" style="text-align:left"><label>Login</label><input id="login" type="text" required
+            autocomplete="off" value=""></div><br>
+        <div class="field" style="text-align:left"><label>Parol</label><input id="password" type="password" required
+            autocomplete="new-password" value=""></div><br><button class="btn btn-primary"
+          style="width:100%">Kirish</button>
+        <p id="loginMsg"></p>
+      </form>
+    </div>
+    <div id="panel" style="display:none">
+      <div id="contentEditor" class="form" style="margin:0 0 24px">
+        <h2 style="margin-top:0">Sayt matnlarini tahrirlash</h2>
+        <p style="color:#64748b">Faqat <b>O‘zbekcha</b> ustunini o‘zgartiring. Saqlaganda tizim ruscha va inglizcha
+          variantlarni avtomatik tarjima qiladi.</p>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px"><button id="saveContent"
+            class="btn btn-primary" type="button">O‘zbekchani saqlash va avtomatik tarjima</button><span
+            id="contentMsg"></span></div>
+        <div style="overflow:auto;border:1px solid #e5e7eb;border-radius:16px">
+          <table style="width:100%;border-collapse:collapse;min-width:980px">
+            <thead>
+              <tr style="background:#f7faf8">
+                <th style="padding:12px;text-align:left">Kalit</th>
+                <th style="padding:12px;text-align:left">O‘zbekcha — tahrirlash</th>
+                <th style="padding:12px;text-align:left">Русский — auto</th>
+                <th style="padding:12px;text-align:left">English — auto</th>
+              </tr>
+            </thead>
+            <tbody id="contentRows"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div
+        style="display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:25px;flex-wrap:wrap">
+        <div><span class="eyebrow">LEARNIFY EDUCATION</span>
+          <h1 style="margin:5px 0">Arizalar</h1>
+        </div>
+        <div style="display:flex;gap:10px"><button class="btn btn-primary" onclick="downloadXlsx()">Lidlarni yuklash (.xlsx) </button><button class="btn btn-primary" onclick="downloadVacanciesXlsx()">Vakansiyalarni yuklash (.xlsx)
+          </button><button class="btn btn-outline" onclick="logout()">Chiqish</button></div>
+      </div>
+      <div class="form" style="overflow:auto">
+        <h3 style="margin-top:0">Mijoz arizalari</h3>
+        <table style="width:100%;border-collapse:collapse;min-width:750px">
+          <thead>
+            <tr style="text-align:left;border-bottom:1px solid #ddd">
+              <th style="padding:12px">Ism</th>
+              <th>Telefon</th>
+              <th>Kurs</th>
+              <th>Izoh</th>
+              <th>Sana</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+      <div class="form" style="overflow:auto;margin-top:20px">
+        <h3 style="margin-top:0">Vakansiya / Rezyumelar</h3>
+        <table style="width:100%;border-collapse:collapse;min-width:1050px">
+          <thead>
+            <tr style="text-align:left;border-bottom:1px solid #ddd">
+              <th style="padding:12px">Nomzod</th>
+              <th>Telefon</th>
+              <th>Vakansiya</th>
+              <th>Tajriba</th>
+              <th>Avvalgi ish joyi</th>
+              <th>Rezyume</th>
+              <th>Sana</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="vacancyRows"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <script>
+    let contentData = {uz: {}, ru: {}, en: {}};
+    function renderContentEditor() {const rows = document.getElementById("contentRows"); const keys = Object.keys(contentData.uz || {}); rows.innerHTML = keys.map(k => `<tr><td style="padding:8px 12px;vertical-align:top;font-family:monospace;font-size:12px">${esc(k)}</td><td style="padding:8px 12px"><textarea data-content-key="${esc(k)}" style="width:100%;min-height:56px;padding:9px;border:1px solid #d9e2dc;border-radius:10px">${esc(contentData.uz[k] ?? "")}</textarea></td><td style="padding:8px 12px;vertical-align:top;color:#64748b">${esc(contentData.ru?.[k] ?? "")}</td><td style="padding:8px 12px;vertical-align:top;color:#64748b">${esc(contentData.en?.[k] ?? "")}</td></tr>`).join("");}
+    async function loadContentEditor() {const r = await fetch("/api/content"); if (!r.ok) return; contentData = await r.json(); renderContentEditor();}
+    document.getElementById("saveContent").addEventListener("click", async () => {const msg = document.getElementById("contentMsg"); const uz = {}; document.querySelectorAll("[data-content-key]").forEach(el => uz[el.dataset.contentKey] = el.value); msg.textContent = "Tarjima qilinmoqda..."; const r = await fetch("/api/admin/content", {method: "POST", headers: {...headers(), "Content-Type": "application/json"}, body: JSON.stringify({uz})}); const j = await r.json(); if (!r.ok) {msg.textContent = j.error || "Xatolik"; return } contentData = j.content; renderContentEditor(); msg.textContent = j.errors?.length ? `Saqlanди, lekin ${j.errors.length} ta tarjima xizmati xatosi bor.` : "Saqlandi: RU va EN avtomatik yangilandi.";});
+
+    let token = localStorage.getItem("learnify_admin");
+    function headers() {return token ? {Authorization: "Bearer " + token} : {}}
+    function showPanel() {document.getElementById("loginBox").style.display = "none"; document.getElementById("panel").style.display = "block"; load(); loadContentEditor()}
+    async function load() {const r = await fetch("/api/admin/leads", {headers: headers()}); if (r.status === 401) return logout(); const j = await r.json(); document.getElementById("rows").innerHTML = j.leads.map(x => `<tr style="border-bottom:1px solid #eee"><td style="padding:12px">${esc(x.name)}</td><td>${esc(x.phone)}</td><td>${esc(x.course)}</td><td>${esc(x.comment)}</td><td>${new Date(x.createdAt).toLocaleString("uz-UZ")}</td><td><button onclick="del('${x.id}')" class="btn btn-outline" style="padding:8px 12px">O‘chirish</button></td></tr>`).join("") || '<tr><td colspan="6" style="padding:30px;text-align:center;color:#777">Hozircha ariza yo‘q</td></tr>'; const vr = await fetch("/api/admin/vacancies", {headers: headers()}); if (vr.status === 401) return logout(); const vj = await vr.json(); document.getElementById("vacancyRows").innerHTML = vj.vacancies.map(x => `<tr style="border-bottom:1px solid #eee"><td style="padding:12px"><b>${esc(x.firstName)} ${esc(x.lastName)}</b></td><td>${esc(x.phone)}</td><td>${esc(x.position)}<br><small>${esc(x.course)}</small></td><td>${esc(x.experience)}</td><td>${esc(x.workplace)}</td><td><a class="btn btn-outline" style="padding:7px 10px" href="${esc(x.resumeUrl)}" target="_blank">Ko‘rish</a></td><td>${new Date(x.createdAt).toLocaleString("uz-UZ")}</td><td><button onclick="delVacancy('${x.id}')" class="btn btn-outline" style="padding:8px 12px">O‘chirish</button></td></tr>`).join("") || '<tr><td colspan="8" style="padding:30px;text-align:center;color:#777">Hozircha vakansiya arizasi yo‘q</td></tr>'}
+    function esc(s) {return String(s || "").replace(/[&<>"']/g, m => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"}[m]))}
+    async function del(id) {if (!confirm("O‘chirishni tasdiqlaysizmi?")) return; await fetch("/api/admin/leads/" + id, {method: "DELETE", headers: headers()}); load()}
+    async function downloadVacanciesXlsx() {const r = await fetch("/api/admin/export-vacancies.xlsx", {headers: headers()}); if (!r.ok) return logout(); const b = await r.blob(); const u = URL.createObjectURL(b); const a = document.createElement("a"); a.href = u; a.download = "learnify-vacancies.xlsx"; a.click(); URL.revokeObjectURL(u)}
+    async function delVacancy(id) {if (!confirm("Vakansiya arizasini o‘chirishni tasdiqlaysizmi?")) return; await fetch("/api/admin/vacancies/" + id, {method: "DELETE", headers: headers()}); load()}
+    async function downloadXlsx() {const r = await fetch("/api/admin/export.xlsx", {headers: headers()}); if (!r.ok) return logout(); const b = await r.blob(); const u = URL.createObjectURL(b); const a = document.createElement("a"); a.href = u; a.download = "learnify-leads.xlsx"; a.click(); URL.revokeObjectURL(u)}
+    async function logout() {localStorage.removeItem("learnify_admin"); token = null; document.getElementById("loginBox").style.display = "block"; document.getElementById("panel").style.display = "none"}
+    document.getElementById("loginForm").addEventListener("submit", async e => {e.preventDefault(); const r = await fetch("/api/admin/login", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({login: login.value, password: password.value})}); const j = await r.json(); if (!r.ok) {loginMsg.textContent = j.error; return } token = j.token; localStorage.setItem("learnify_admin", token); showPanel()});
+    if (token) showPanel();
+  </script>
+</body>
+
+</html>
