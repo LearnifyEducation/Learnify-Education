@@ -14,7 +14,7 @@ Bu loyiha Inter Nation saytining umumiy axborot arxitekturasi va zamonaviy landi
 ## Admin
 - URL: `http://localhost:3000/admin`
 - Login: `LearnifyEdu`
-- Parol: `LearnifyEducation2026`
+- Parol: ``
 
 ## Leadlar
 Kontakt formasi `data/leads.json` ga yoziladi. Admin paneldan ko'rish, o'chirish va XLSX eksport qilish mumkin.
