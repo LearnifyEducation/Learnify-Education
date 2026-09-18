@@ -1,6 +1,6 @@
 {
   "uz": {
-    "top.tag": "O'qi bilim ol",
+    "top.tag": "Learnify Education — Learn smart, grow fast!",
     "top.hours": "50 277 63 05",
     "nav.about": "Biz haqimizda",
     "nav.courses": "Kurslar",
@@ -141,7 +141,7 @@
     "vacancy.error": "Rezyume yuborishda xatolik yuz berdi."
   },
   "ru": {
-    "top.tag": "Читайте и учитесь.",
+    "top.tag": "Learnify Education — Учитесь эффективно, развивайтесь быстро!",
     "top.hours": "50 277 63 05",
     "nav.about": "О нас",
     "nav.courses": "Курсы",
@@ -282,7 +282,7 @@
     "vacancy.error": "Не удалось отправить резюме."
   },
   "en": {
-    "top.tag": "Read and learn.",
+    "top.tag": "Learnify Education — Learn smart, grow fast!",
     "top.hours": "50 277 63 05",
     "nav.about": "About us",
     "nav.courses": "Courses",

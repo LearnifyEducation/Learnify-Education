@@ -58,23 +58,120 @@ function restoreMarkup(text,tags) {
   let out=String(text ?? "");
   for (const [key,tag] of tags) out=out.split(key).join(tag);
   return out;
-}
-async function translateText(text, target) {
-  const source=String(text ?? "");
-  if (!source.trim() || target === "uz") return source;
-  const {safe,tags}=protectMarkup(source);
+}async function translateText(text, target) {
+  const source = String(text ?? "");
+
+  if (!source.trim() || target === "uz") {
+    return source;
+  }
+
+  const { safe, tags } = protectMarkup(source);
+
+  // 1-usul: Google Translate
   try {
-    const url=`https://api.mymemory.translated.net/get?q=${encodeURIComponent(safe)}&langpair=uz|${target}`;
-    const r=await fetch(url,{headers:{"User-Agent":"Learnify-Education/1.0"}});
-    if (!r.ok) throw new Error(`Translation service ${r.status}`);
-    const j=await r.json();
-    const translated=j?.responseData?.translatedText;
-    if (!translated) throw new Error("Empty translation");
-    return restoreMarkup(translated,tags);
+    const googleUrl =
+      "https://translate.googleapis.com/translate_a/single" +
+      "?client=gtx&sl=uz&tl=" +
+      encodeURIComponent(target) +
+      "&dt=t&q=" +
+      encodeURIComponent(safe);
+
+    const r = await fetch(googleUrl, {
+      headers: {
+        "User-Agent": "Mozilla/5.0"
+      }
+    });
+
+    if (r.ok) {
+      const data = await r.json();
+
+      const translated = Array.isArray(data?.[0])
+        ? data[0]
+            .map(item => item?.[0] || "")
+            .join("")
+        : "";
+
+      if (translated.trim()) {
+        return restoreMarkup(translated, tags);
+      }
+    }
   } catch (e) {
-    throw new Error(`Auto tarjima ${target.toUpperCase()} uchun ishlamadi: ${e.message}`);
+    console.log("Google Translate xatosi:", e.message);
+  }
+
+  // 2-usul: MyMemory
+  try {
+    const url =
+      "https://api.mymemory.translated.net/get" +
+      "?q=" +
+      encodeURIComponent(safe) +
+      "&langpair=uz|" +
+      encodeURIComponent(target);
+
+    const r = await fetch(url, {
+      headers: {
+        "User-Agent": "Learnify-Education/1.0"
+      }
+    });
+
+    if (r.ok) {
+      const j = await r.json();
+      const translated = j?.responseData?.translatedText;
+
+      if (translated && translated.trim()) {
+        return restoreMarkup(translated, tags);
+      }
+    }
+  } catch (e) {
+    console.log("MyMemory xatosi:", e.message);
+  }
+
+  throw new Error(
+    `Auto tarjima ${target.toUpperCase()} uchun ishlamadi`
+  );
+}
+
+async function translateText(text, target) {
+  const source = String(text ?? "");
+
+  if (!source.trim() || target === "uz") {
+    return source;
+  }
+
+  const { safe, tags } = protectMarkup(source);
+
+  try {
+    const url =
+      `https://api.mymemory.translated.net/get` +
+      `?q=${encodeURIComponent(safe)}` +
+      `&langpair=uz|${target}`;
+
+    const r = await fetch(url, {
+      headers: {
+        "User-Agent": "Learnify-Education/1.0"
+      }
+    });
+
+    if (!r.ok) {
+      throw new Error(`Translation service ${r.status}`);
+    }
+
+    const j = await r.json();
+    const translated = j?.responseData?.translatedText;
+
+    if (!translated) {
+      throw new Error("Empty translation");
+    }
+
+    return restoreMarkup(translated, tags);
+
+  } catch (e) {
+    throw new Error(
+      `Auto tarjima ${target.toUpperCase()} uchun ishlamadi: ${e.message}`
+    );
   }
 }
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, UPLOAD_DIR),
   filename: (req, file, cb) => {

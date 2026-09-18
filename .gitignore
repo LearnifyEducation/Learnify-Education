@@ -1,0 +1,5 @@
+node_modules/
+uploads/
+data/leads.json
+data/vacancies.json
+.env
