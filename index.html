@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Learnify Education — Learn smart, grow fast!</title>
-  <meta name="description" content="Learnify Education — ingliz tili, IELTS va zamonaviy ta'lim dasturlari.">
+  <meta name="description" content="Learnify Education — Learn smart, Grow fast!.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
@@ -502,7 +502,7 @@
     });
 
     function applyLang(lang) {const dict = T[lang] || T.uz; document.documentElement.lang = lang; document.getElementById('currentLang').textContent = lang.toUpperCase(); localStorage.setItem('learnifyLang', lang); document.querySelectorAll('[data-i18n]').forEach(el => {const k = el.dataset.i18n; if (dict[k] !== undefined) el.textContent = dict[k]}); document.querySelectorAll('[data-i18n-html]').forEach(el => {const k = el.dataset.i18nHtml; if (dict[k] !== undefined) el.innerHTML = dict[k]}); document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {const k = el.dataset.i18nPlaceholder; if (dict[k] !== undefined) el.placeholder = dict[k]}); document.title = lang === 'ru' ? 'Learnify Education — образование и результат' : lang === 'en' ? 'Learnify Education — learning and results' : 'Learnify Education — Ta’limda yangi natijalar'; document.getElementById('languageMenu').classList.remove('open');}
-    async function loadServerTranslations() {try {const r = await fetch('/api/content', {cache: 'no-store'}); if (!r.ok) return; const c = await r.json();['uz', 'ru', 'en'].forEach(lang => {if (c[lang] && typeof c[lang] === 'object') Object.assign(T[lang], c[lang]);}); applyLang(localStorage.getItem('learnifyLang') || 'uz');} catch (e) {/* built-in translations remain available */} }
+    async function loadServerTranslations() {try {const r = await fetch('https://learnify-education.onrender.com/api/content', {cache:'no-store'}); if (!r.ok) return; const c = await r.json();['uz', 'ru', 'en'].forEach(lang => {if (c[lang] && typeof c[lang] === 'object') Object.assign(T[lang], c[lang]);}); applyLang(localStorage.getItem('learnifyLang') || 'uz');} catch (e) {/* built-in translations remain available */} }
     const saved = localStorage.getItem('learnifyLang') || 'uz'; applyLang(saved); loadServerTranslations();
     document.getElementById('languageBtn').addEventListener('click', () => document.getElementById('languageMenu').classList.toggle('open'));
     document.querySelectorAll('[data-lang]').forEach(b => b.addEventListener('click', () => applyLang(b.dataset.lang)));
